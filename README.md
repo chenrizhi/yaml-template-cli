@@ -7,9 +7,13 @@
 参数如下：
 
 > -i              输入目录
+> 
 > -o              输出目录
+> 
 > -s              使用标准输入（stdin）作为模板
+> 
 > -v              指定values文件路径，可以指定多个，多个values会merge成一个，后者覆盖前着
+> 
 > --set key=value 命令行设置value，优先级最高，会覆盖values文件的值
 
 常见用法：
