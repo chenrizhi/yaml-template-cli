@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -16,7 +16,13 @@ import (
 var globalUsage = `The YAML templates renderer
 `
 
-func newRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
+var settings = New()
+
+func init() {
+	log.SetFlags(log.Lshortfile)
+}
+
+func NewRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 	cmd := &cobra.Command{
 		Use:          "yaml-templates-cli",
 		Short:        "The YAML templates renderer",
@@ -36,6 +42,8 @@ func newRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 
 	flags.ParseErrorsWhitelist.UnknownFlags = true
 	flags.Parse(args)
+
+	cmd.AddCommand(versionCmd)
 
 	settings.ParseOverrideValues(overrides)
 
