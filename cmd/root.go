@@ -42,6 +42,7 @@ func NewRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 
 	flags.ParseErrorsWhitelist.UnknownFlags = true
 	flags.Parse(args)
+	os.Args = args[:1] // 这里解析参数，将参数去掉了，避免重复处理
 
 	cmd.AddCommand(versionCmd)
 
