@@ -31,8 +31,9 @@ func NewRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := handler()
 			if err != nil {
-				out.Write([]byte(err.Error()))
-				return
+				if _, err := out.Write([]byte(err.Error())); err != nil {
+					return
+				}
 			}
 		},
 	}
@@ -41,7 +42,10 @@ func NewRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 	settings.AddFlags(flags)
 
 	flags.ParseErrorsWhitelist.UnknownFlags = true
-	flags.Parse(args)
+	err := flags.Parse(args)
+	if err != nil {
+		return nil, err
+	}
 	os.Args = args[:1] // 这里解析参数，将参数去掉了，避免重复处理
 
 	cmd.AddCommand(versionCmd)
@@ -69,6 +73,9 @@ func handler() error {
 			Values: values,
 		}
 		render, err := engine.Render(tpl, tpl.Values)
+		if err != nil {
+			return err
+		}
 		if settings.OutputDir == "" {
 			for k, v := range render {
 				fmt.Printf("# Source: %s\n%s\n---\n", k, v)
@@ -81,12 +88,10 @@ func handler() error {
 	}
 	yamlFiles, err := fileutil.ListAllFilesWithExt(settings.InputDir, []string{".yaml", ".yml"})
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	tpls, err := fileutil.ReadTemplateFiles(yamlFiles, settings.ValuesFiles)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	tpls.Values.OverrideValues(settings.Overrides)
