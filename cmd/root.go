@@ -96,6 +96,9 @@ func handler() error {
 	}
 	tpls.Values.OverrideValues(settings.Overrides)
 	render, err := engine.Render(tpls, tpls.Values)
+	if err != nil {
+		return err
+	}
 	if settings.OutputDir == "" {
 		for k, v := range render {
 			fmt.Printf("# Source: %s\n%s\n---\n", k, v)
